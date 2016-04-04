@@ -38,13 +38,23 @@ class FrameFinder:
             if self.verbose:
                 print "found " + filename + " found: " + str(found)
             
-            num = found[0]
+            if len(found) > 0:
+                num = found[0]
+            else:
+                num = ""
+            
             if num.isdigit():
-                
                 found_numbers.append(int(num))
+            else:
+                if self.verbose:
+                    print "Could not find a digit in filename '" + filename + "' using '" + reg_exp + "'"
+                continue # next frame
 
+        if len(found_numbers) == 0:
+            print "Did not find any files!"
+            return missing_files
+                
         found_numbers = sorted(found_numbers)
-
         prev = found_numbers[0]
 
         for num in found_numbers:
