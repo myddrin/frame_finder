@@ -24,9 +24,10 @@ class FrameFinder:
     def getFilename(self, number = 0):
         return self.prefix + str(number).zfill(self.zfill) + "." + self.extension
 
-    def verify(self, basedir = "."):
+    def find_missing(self, basedir = "."):
 
         found_numbers = list()
+        missing_files = list()
 
         print "searching in " + basedir
 
@@ -52,28 +53,50 @@ class FrameFinder:
                 
                 missing = prev+1
                 filename = self.getFilename(missing)
-                
-                if self.duplicate:
-                    
-                    prev_filename = self.getFilename(prev)
-                    
-                    print "copying " + prev_filename + " to " + filename
-                        
-                    shutil.copyfile(basedir + "/" + prev_filename, basedir + "/" + filename)
-                
-                elif self.createEmpty:
-                    
-                    print "touch " + filename
-                        
-                    touch(basedir + "/" + filename)
-                
-                else:
-                    
-                    print "missing file " + filename
-                
+                missing_files.append(filename)
                 prev = missing
             
             prev = num
+        
+        return missing_files
+
+    def apply(self, basedir, missing_files):
+        
+        for filename in missing_files:
+            
+            if self.duplicate:
+                
+                found = re.findall(self.reg_exp, filename)
+                if found.size() > 0:
+                    num = found[0]
+                else:
+                    raise ValueError("regexp '" + reg_exp + "' failed to find 1 group in '" + str(filename) + "'")
+                if num.isdigit():
+                    prev = int(num) - 1
+                else:
+                    raise ValueError("could not find number in filename '" + str(filename) + "' given as input")
+                prev_filename = self.getFilename(prev)
+                
+                print "copying " + prev_filename + " to " + filename
+                    
+                shutil.copyfile(basedir + "/" + prev_filename, basedir + "/" + filename)
+            
+            elif self.createEmpty:
+                
+                print "touch " + filename
+                    
+                touch(basedir + "/" + filename)
+            
+            else:
+                
+                print "missing file " + filename
+            
+
+    def verify(self, basedir):
+        
+        missing_files = self.find_missing(basedir)
+        self.apply(basedir, missing_files)
+        
 
 if __name__ == "__main__":
     
@@ -122,8 +145,8 @@ if __name__ == "__main__":
     finder.zfill = args.zfill
     
     for directory in args.dir:
-        
-		if os.path.isdir(directory):
-			finder.verify(directory)
-		else:
-			print directory + " is not a directory"
+        if os.path.isdir(directory):
+            finder.verify(directory)
+            print "" # empty line
+        else:
+            print directory + " is not a directory"
