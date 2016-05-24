@@ -27,6 +27,15 @@ def touch(path):
 
 
 class FrameFinder:
+    """
+    Object to check that files following a sequence of numbers exist
+    """
+
+    class Operations:
+        NONE, DUPLICATE, TOUCH = range(3)
+        # NONE: do nothin besides printing when not finding a file
+        # DUPLICATE: When not finding a file duplicate the last found one
+        # TOUCH: When not finding a file create a new empty file
 
     def __init__(self, prefix="image", extension="exr",
                  zfill=4, duplicate=False):
@@ -40,12 +49,6 @@ class FrameFinder:
         """filename extension"""
         self.reg_exp = self.prefix + base_regexp + self.extension
         self.verbose = False
-
-        self.duplicate = duplicate
-        """duplicate last found file - or create empty file"""
-
-        self.createEmpty = not duplicate
-        """create empty file - or duplicate"""
 
         self.zfill = 4
         """number of digits to use to create a name with leading 0s"""
@@ -101,14 +104,14 @@ class FrameFinder:
             prev = num
         return missing_files
 
-    def apply(self, basedir, missing_files):
+    def apply(self, basedir, missing_files, ope):
         """
         Given a list of missing file will apply the given option using
         duplicate and createEmpty options
+        Default operation is NONE
         """
-
         for filename in missing_files:
-            if self.duplicate:
+            if ope == FrameFinder.Operations.DUPLICATE:
                 found = re.findall(self.reg_exp, filename)
                 if found.size() > 0:
                     num = found[0]
@@ -125,18 +128,21 @@ class FrameFinder:
                 print "copying " + prev_filename + " to " + filename
                 shutil.copyfile(basedir + "/" + prev_filename,
                                 basedir + "/" + filename)
-            elif self.createEmpty:
+            elif ope == FrameFinder.Operations.TOUCH:
                 print "touch " + filename
                 touch(basedir + "/" + filename)
-            else:
+            elif ope == FrameFinder.Operations.NONE:
+                # operation has to be NONE
                 print "missing file " + filename
+            else:
+                raise ValueError("Invalid operation '" + ope + "' given")
 
-    def verify(self, basedir):
+    def verify(self, basedir, ope=Operations.NONE):
         """
         Utility method to verify a directory
         """
         missing_files = self.find_missing(basedir)
-        self.apply(basedir, missing_files)
+        self.apply(basedir, missing_files, ope)
 
 
 if __name__ == "__main__":
@@ -188,12 +194,15 @@ if __name__ == "__main__":
         finder.reg_exp = args.reg_exp
 
     finder.verbose = args.verbose
-    finder.duplicate = args.duplicate
-    finder.createEmpty = args.touch
+    operation = FrameFinder.Operations.NONE
+    if args.duplicate:
+        operation = FrameFinder.operations.DUPLICATE
+    elif args.touch:
+        operation = FrameFinder.operations.TOUCH
 
     for directory in args.dir:
         if os.path.isdir(directory):
-            finder.verify(directory)
+            finder.verify(directory, operation)
             print ""  # empty line between dirs
         else:
             print directory + " is not a directory"
