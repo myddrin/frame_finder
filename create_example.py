@@ -3,14 +3,15 @@ import os
 import shutil
 from frame_finder import *
 
-def create_folder(name, prefix, start, end, ext, fill, miss):
 
+def create_folder(name, prefix, start, end, ext, fill, miss):
     if not os.path.exists(name):
         os.mkdir(name)
-    print "poulating " + name + " from " + prefix + str(start).zfill(fill) + "." + ext + " to " + prefix + str(end).zfill(fill) + "." + ext
+    print ("populating " + name + " from " + prefix + str(start).zfill(fill) +
+           "." + ext + " to " + prefix + str(end).zfill(fill) + "." + ext)
 
     for f in range(start, end):
-        if f%miss != 0:
+        if f % miss != 0:
             touch(name + "/image" + str(f).zfill(fill) + "." + ext)
 
 
