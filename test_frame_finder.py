@@ -48,7 +48,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill, 1)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill, 1)
 
         missing = finder.find_missing(fold)
         print "len(missing) = " + str(len(missing))
@@ -60,7 +61,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill, 2)
         # should be missing frame 2
 
         missing = finder.find_missing(fold)
@@ -68,15 +70,18 @@ class FrameFinderTest:
 
         if len(missing) != 1:
             raise ValueError("should be missin only 1 frame")
-        expected = finder.prefix + str(2).zfill(finder.zfill) + "." + finder.extension
+        expected = (finder.prefix + str(2).zfill(finder.zfill) +
+                    "." + finder.extension)
         if missing[0] != expected:
-            raise ValueError("expecting " + expected + " but got " + missing[0])
+            raise ValueError("expecting " + expected + " but got " +
+                             missing[0])
 
     def test_printing(self):
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill + 1, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill + 1, 2)
         # should be missing frame 2 but the numbering generated is bigger
 
         missing = finder.find_missing(fold)
@@ -94,7 +99,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill, 2)
         # should be missing frame 2 but the numbering generated is bigger
 
         missing = finder.find_missing(fold)
@@ -114,7 +120,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill, 2)
         # should be missing frame 2 but the numbering generated is bigger
 
         missing = finder.find_missing(fold)
@@ -134,7 +141,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill + 1, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill + 1, 2)
         # should be missing frame 2 but the numbering generated is bigger
 
         missing = finder.find_missing(fold)
@@ -154,7 +162,8 @@ class FrameFinderTest:
         fold = self.init_test()
 
         finder = FrameFinder()
-        create_folder(fold, finder.prefix, 0, 4, finder.extension, finder.zfill + 1, 2)
+        create_folder(fold, finder.prefix, 0, 4,
+                      finder.extension, finder.zfill + 1, 2)
         # should be missing frame 2 but the numbering generated is bigger
 
         missing = finder.find_missing(fold)
@@ -181,4 +190,4 @@ if __name__ == "__main__":
     test.test_duplicate()
     # if zfill is wrong duplicate fails to duplicate
     test.test_touch_zfill()
-    #test.test_duplicate_zfill()  # TODO: enable back when fixed
+    # test.test_duplicate_zfill()  # TODO: enable back when fixed
