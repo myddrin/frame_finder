@@ -1,18 +1,20 @@
+#!/usr/bin/python
+
+"""
+Utility to create an example folder
+
+Copyright (c) 2016 Thomas Richard
+
+Following MIT license (see copying.txt)
+
+The software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose and noninfringement.
+"""
 
 import os
 import shutil
-from frame_finder import *
-
-
-def create_folder(name, prefix, start, end, ext, fill, miss):
-    if not os.path.exists(name):
-        os.mkdir(name)
-    print ("populating " + name + " from " + prefix + str(start).zfill(fill) +
-           "." + ext + " to " + prefix + str(end).zfill(fill) + "." + ext)
-
-    for f in range(start, end):
-        if f % miss != 0:
-            touch(name + "/image" + str(f).zfill(fill) + "." + ext)
+from test_frame_finder import create_folder
 
 
 if __name__ == "__main__":
