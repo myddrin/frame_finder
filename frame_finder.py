@@ -38,7 +38,7 @@ class FrameFinder:
         # TOUCH: When not finding a file create a new empty file
 
     def __init__(self, prefix="image", extension="exr",
-                 zfill=4, duplicate=False):
+                 zfill=4):
         # local variable as not used after creation
         base_regexp = "([0-9]*)\."
         """base_regexp: to allow update in case prefix or extension changed"""
@@ -53,12 +53,12 @@ class FrameFinder:
         self.zfill = 4
         """number of digits to use to create a name with leading 0s"""
 
-    def getFilename(self, number=0):
+    def get_filename(self, number=0):
         """
         Return filename based on prefix, number zfill and extension
         """
-        return self.prefix + str(number).zfill(self.zfill) \
-            + "." + self.extension
+        return (self.prefix + str(number).zfill(self.zfill) +
+                "." + self.extension)
 
     def find_missing(self, basedir="."):
         """
@@ -98,7 +98,7 @@ class FrameFinder:
         for num in found_numbers:
             while prev+1 < num:
                 missing = prev+1
-                filename = self.getFilename(missing)
+                filename = self.get_filename(missing)
                 missing_files.append(filename)
                 prev = missing
             prev = num
@@ -113,7 +113,7 @@ class FrameFinder:
         for filename in missing_files:
             if ope == FrameFinder.Operations.DUPLICATE:
                 found = re.findall(self.reg_exp, filename)
-                if found.size() > 0:
+                if len(found) > 0:
                     num = found[0]
                 else:
                     raise ValueError("regexp '" + reg_exp +
@@ -124,13 +124,13 @@ class FrameFinder:
                 else:
                     raise ValueError("could not find number in filename '" +
                                      str(filename) + "' given as input")
-                prev_filename = self.getFilename(prev)
+                prev_filename = self.get_filename(prev)
                 print "copying " + prev_filename + " to " + filename
-                shutil.copyfile(basedir + "/" + prev_filename,
-                                basedir + "/" + filename)
+                shutil.copyfile(os.path.join(basedir, prev_filename),
+                                os.path.join(basedir, filename))
             elif ope == FrameFinder.Operations.TOUCH:
                 print "touch " + filename
-                touch(basedir + "/" + filename)
+                touch(os.path.join(basedir, filename))
             elif ope == FrameFinder.Operations.NONE:
                 # operation has to be NONE
                 print "missing file " + filename
@@ -196,9 +196,14 @@ if __name__ == "__main__":
     finder.verbose = args.verbose
     operation = FrameFinder.Operations.NONE
     if args.duplicate:
-        operation = FrameFinder.operations.DUPLICATE
+        operation = FrameFinder.Operations.DUPLICATE
     elif args.touch:
-        operation = FrameFinder.operations.TOUCH
+        operation = FrameFinder.Operations.TOUCH
+
+    print "prefix: " + finder.prefix
+    print "extension: " + finder.extension
+    print "no digits: " + str(finder.zfill)
+    print ""
 
     for directory in args.dir:
         if os.path.isdir(directory):
